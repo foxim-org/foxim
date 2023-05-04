@@ -1,0 +1,7 @@
+.env
+node_modules
+output
+dummy.js
+dummy1.js
+unsafe.js
+alt.js
