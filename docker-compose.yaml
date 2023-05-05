@@ -1,0 +1,50 @@
+version: '3'
+
+services:
+  nacos:
+    image: nacos/nacos-server@latest
+    ports:
+      - 8848:8848
+      - 9848:9848
+    volumes:
+      - ./standalone-logs/:/home/nacos/logs
+      - ./init.d/application.properties:/home/nacos/conf/application.properties
+    env_file:
+      - ./env/nacos-standlone-mysql.env
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: on-failure
+
+  mysql:
+    build:
+      context: .
+      dockerfile: ./images/mysql/Dockerfile
+    image: example/mysql:5.7
+    ports:
+      - 3306:3306
+    volumes:
+      - mysql-data:/var/lib/mysql
+    env_file:
+      - ./env/mysql.env
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
+      interval: 5s
+      timeout: 10s
+      retries: 10
+
+  mongodb:
+    image: mongo:latest
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodb-data:/data/db
+
+  redis:
+    image: redis:latest
+    ports:
+      - 6379:6379
+
+volumes:
+  mysql-data:
+  mongodb-data:
